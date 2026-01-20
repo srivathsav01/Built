@@ -74,7 +74,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center gap-6 px-4">
+    <div className="flex flex-col items-center justify-center gap-6 px-4 h-full">
       {isPending && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-4">

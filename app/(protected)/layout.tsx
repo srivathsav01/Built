@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth/getCurrentUser';
-import Header from '@/components/Header';
 
 export default async function ProtectedLayout({
   children,
@@ -15,8 +14,7 @@ export default async function ProtectedLayout({
 
   return (
     <>
-      <Header />
-      <main>{children}</main>
+      {children}
     </>
   );
 }

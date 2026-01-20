@@ -16,6 +16,7 @@ const Header = memo(() => {
   const {setIsLoading} = useLoading();
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const pathname = "/" + usePathname().split("/")[1]
   const isAuthenticated = !!user;
 
@@ -29,10 +30,14 @@ const Header = memo(() => {
       console.log(error);
     }
   };
+
+  useEffect(() => setMounted(true), [])
+
+  if (!mounted) return null
   
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-10 bg-background">
+      <nav className="sticky top-0 left-0 right-0 z-10 bg-background">
         <div className="max-w-300 mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div></div>
@@ -60,7 +65,7 @@ const Header = memo(() => {
               {isAuthenticated ? (
                 <div className="flex items-center gap-2 ml-2">
                   <Link
-                    href="/profile"
+                    href={`/profile/${user?.id}`}
                     className="flex items-center justify-center w-9 h-9 rounded-lg text-foreground hover:text-primary hover:bg-accent/50 transition-all duration-300 focus-ring"
                     title={user?.user_metadata.display_name || user?.email || "Profile"}
                   >
@@ -129,7 +134,7 @@ const Header = memo(() => {
               {isAuthenticated ? (
                 <>
                   <Link
-                    href="/profile"
+                    href={`/profile/${user?.id}`}
                     onClick={() => setIsMenuOpen(false)}
                     className="block px-4 py-2 rounded-lg transition-all duration-200 font-medium text-sm text-foreground hover:text-primary hover:bg-accent/50"
                   >

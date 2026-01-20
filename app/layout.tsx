@@ -31,7 +31,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased h-screen`}
       >
         <ThemeProvider
           attribute="class"
@@ -40,8 +40,12 @@ export default async function RootLayout({
         >
           <LoadingProvider>
             <GlobalLoader />
-            <Header />
-            {children}
+            <div className="grid grid-rows-[auto_1fr] h-full">
+              <Header />
+              <main className="overflow-auto">
+                {children}
+              </main>
+            </div>
           </LoadingProvider>
         </ThemeProvider>
       </body>

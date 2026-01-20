@@ -26,7 +26,7 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="relative flex flex-col min-h-screen items-center justify-center gap-6">
+    <div className="relative flex flex-col h-full items-center justify-center gap-6">
       {isPending && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-4">
@@ -36,7 +36,7 @@ export default function UploadPage() {
         </div>
       )}
       <div className={isPending ? "blur-sm pointer-events-none" : ""}>
-        <h1 className="text-xl font-bold">Upload InBody Report</h1>
+        <h1 className="text-xl font-bold mb-3 flex items-center justify-center">Upload InBody Report</h1>
         <div className="flex flex-col items-center gap-4">
           <Input
             type="file"
