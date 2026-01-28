@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-
 export const ReportDTOSchema = z.object({
   id: z.string().uuid().optional(),
   userId: z.string().uuid(),
@@ -59,7 +58,6 @@ export const UpdateReportDTOSchema = ReportDTOSchema.partial().required({
 });
 
 export type UpdateReportDTO = z.infer<typeof UpdateReportDTOSchema>;
-
 
 export const ReportSummaryDTOSchema = ReportDTOSchema.pick({
   id: true,

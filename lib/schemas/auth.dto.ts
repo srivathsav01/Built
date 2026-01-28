@@ -7,7 +7,6 @@ export const LoginDTOSchema = z.object({
 
 export type LoginDTO = z.infer<typeof LoginDTOSchema>;
 
-
 export const SignUpDTOSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),

@@ -120,7 +120,6 @@ export default function HumanModel3D({ metrics }: { metrics?: Array<{ label: str
     }
   }
 
-
   return (
     <div className="flex items-center justify-center w-full h-full">
       <div className="w-[500px] h-[450px] max-w-full max-h-[70vh] overflow-hidden">
