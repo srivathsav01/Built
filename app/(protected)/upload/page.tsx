@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLoading } from "@/lib/context/LoadingContext";
 import { InBodyData } from "@/lib/inbody";
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
   const [isPending, startTransition] = useTransition();
   const { setIsLoading } = useLoading();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const submit = async () => {
     if (!file) return;
@@ -37,6 +38,7 @@ export default function UploadPage() {
       finally{
         setIsLoading(false);
         setFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
       }
     });
   };
@@ -56,6 +58,7 @@ export default function UploadPage() {
         <div className="flex flex-col items-center gap-4">
           <div className="w-full max-w-md">
             <Input
+              ref={fileInputRef}
               type="file"
               accept="image/*"
               className="cursor-pointer"
