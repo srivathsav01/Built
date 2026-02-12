@@ -4,24 +4,9 @@ import HumanModel3D from "@/components/HumanModel3D";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useEffect, useState } from "react";
 
-type Report = {
-  id: string
-  userId: string
-  date: string
-  mineral: number
-  protein: number
-  totalBodyWater: number
-  weight: number
-  bodyFatMass: number
-  bodyFatPct: number
-  skeletalMuscleMass: number
-  bodyMassIndex: number
-  createdAt: string
-}
-
 export default function Home() {
   const user = useCurrentUser();
-  const [report, setReport] = useState<Report | null>(null);
+  const [report, setReport] = useState<Reports | null>(null);
 
   useEffect(() => {
     if (user) {

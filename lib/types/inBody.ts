@@ -1,0 +1,1 @@
+export type { InBodyData } from "@/lib/inbody/types";

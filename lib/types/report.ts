@@ -10,5 +10,7 @@ type Reports = {
   bodyFatPct: number
   skeletalMuscleMass: number
   bodyMassIndex: number
+  height: number
+  age: number
   createdAt: string
 }

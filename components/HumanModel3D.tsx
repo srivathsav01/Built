@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, Suspense, useMemo } from 'react';
+import { useRef, Suspense, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, useGLTF, Environment, Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -113,6 +113,29 @@ function ModelLoader() {
 
 export default function HumanModel3D({ metrics }: { metrics?: Array<{ label: string; value: string }> }) {
   const modelPath = '/human-model.glb';
+  const [showHint, setShowHint] = useState(true);
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const interactionTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  useEffect(() => {
+    interactionTimeoutRef.current = setTimeout(() => {
+      setShowHint(false);
+    }, 8000);
+
+    return () => {
+      if (interactionTimeoutRef.current) {
+        clearTimeout(interactionTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleCanvasInteraction = () => {
+    setShowHint(false);
+    if (interactionTimeoutRef.current) {
+      clearTimeout(interactionTimeoutRef.current);
+    }
+  };
+
   if (typeof window !== 'undefined') {
     try {
       useGLTF.preload(modelPath);
@@ -121,13 +144,16 @@ export default function HumanModel3D({ metrics }: { metrics?: Array<{ label: str
   }
 
   return (
-    <div className="flex items-center justify-center w-full h-full">
-      <div className="w-[500px] h-[450px] max-w-full max-h-[70vh] overflow-hidden">
+    <div className="relative flex items-center justify-center w-full h-full">
+      <div className="w-[500px] h-[450px] max-w-full max-h-[70vh] overflow-hidden relative" ref={canvasRef}>
         <Canvas
           shadows
           gl={{ antialias: true }}
           style={{ background: 'transparent', width: '100%', height: '100%' }}
           camera={{ position: [-4, 0.3, 2.5], fov: 45 }}
+          onPointerDown={handleCanvasInteraction}
+          onPointerMove={handleCanvasInteraction}
+          onWheel={handleCanvasInteraction}
         >
         <PerspectiveCamera makeDefault position={[-4, 0.3, 2.5]} fov={45} />
         
@@ -187,6 +213,29 @@ export default function HumanModel3D({ metrics }: { metrics?: Array<{ label: str
         />
         </Canvas>
       </div>
+
+      {showHint && (
+        <div 
+          className={`absolute bottom-6 left-1/2 transform -translate-x-1/2 transition-all duration-500 ${
+            showHint ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+          }`}
+        >
+          <div className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-purple-500/10 border border-purple-400/30 rounded-full backdrop-blur-md shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <svg 
+              className="w-5 h-5 text-purple-400 animate-spin" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            
+            <span className="text-sm font-medium text-transparent bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text whitespace-nowrap animate-pulse">
+              Drag to explore →
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

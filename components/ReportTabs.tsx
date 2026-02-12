@@ -3,19 +3,6 @@
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
-type Report = {
-  id: string
-  date: string
-  mineral: number
-  protein: number
-  totalBodyWater: number
-  weight: number
-  bodyFatMass: number
-  bodyFatPct: number
-  skeletalMuscleMass: number
-  bodyMassIndex: number
-}
-
 type Segment = {
   id: string
   segment: string
@@ -23,7 +10,7 @@ type Segment = {
   fatMassKg: number | null
 }
 
-export default function ReportsTabs({ reports }: { reports: Report[] }) {
+export default function ReportsTabs({ reports }: { reports: Reports[] }) {
   const [selectedReportId, setSelectedReportId] = useState(reports[0]?.id)
   const [segments, setSegments] = useState<Segment[] | null>(null)
   const [loadingSegments, setLoadingSegments] = useState(false)
