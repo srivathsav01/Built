@@ -2,15 +2,62 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { InBodyDataValidationDialog } from "@/components/InBodyDataValidationDialog";
 import { useLoading } from "@/lib/context/LoadingContext";
 import { InBodyData } from "@/lib/inbody";
 import { useRef, useState, useTransition } from "react";
+
+const EMPTY_INBODY_DATA: InBodyData = {
+  totalBodyWater: null,
+  protein: null,
+  mineral: null,
+  bodyFatMass: null,
+  skeletalMuscleMass: null,
+  bmi: null,
+  weight: null,
+  height: null,
+  age: null,
+  pbf: null,
+  testDateTime: null,
+};
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
   const [isPending, startTransition] = useTransition();
   const { setIsLoading } = useLoading();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [extractedData, setExtractedData] = useState<InBodyData | null>(null);
+  const [showValidationDialog, setShowValidationDialog] = useState(false);
+  const [isManualEntry, setIsManualEntry] = useState(false);
+
+  const handleConfirmData = async (validatedData: InBodyData) => {
+    try {
+      setIsLoading(true);
+      const res = await fetch("/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(validatedData),
+      });
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Failed to save report");
+
+      console.log("Report saved successfully:", json.data);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error("Error saving report:", message);
+    } finally {
+      setIsLoading(false);
+      setExtractedData(null);
+      setIsManualEntry(false);
+    }
+  };
+
+  const openManualEntry = () => {
+    setExtractedData(EMPTY_INBODY_DATA);
+    setIsManualEntry(true);
+    setShowValidationDialog(true);
+  };
 
   const submit = async () => {
     if (!file) return;
@@ -29,7 +76,8 @@ export default function UploadPage() {
         if (!res.ok) throw new Error(json.error || "Upload failed");
         
         const inBodyData: InBodyData = json.data;
-        console.log("Extracted InBody Data:", inBodyData);
+        setExtractedData(inBodyData);
+        setShowValidationDialog(true);
       }
       catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
@@ -67,7 +115,7 @@ export default function UploadPage() {
             />
             <div className="flex items-center gap-2 rounded-md p-1 mb-1">
               <span className="text-xl">⚠️</span>
-              <span className="text-sm text-yellow-300">Segment split recognition yet to be implemented</span>
+              <span className="text-sm text-yellow-500">Segment split recognition yet to be implemented</span>
             </div>
             
             <Button
@@ -77,9 +125,34 @@ export default function UploadPage() {
             >
               {isPending ? "Uploading..." : "Upload"}
             </Button>
+
+            <div className="flex items-center gap-4 my-4">
+              <div className="flex-1 h-px bg-border"></div>
+              <span className="text-sm text-muted-foreground">or</span>
+              <div className="flex-1 h-px bg-border"></div>
+            </div>
+
+            <Button
+              onClick={openManualEntry}
+              variant="outline"
+              disabled={isPending}
+              className="p-2 cursor-pointer w-full"
+            >
+              Enter Values Manually
+            </Button>
           </div>
         </div>
       </div>
+
+      {extractedData && (
+        <InBodyDataValidationDialog
+          open={showValidationDialog}
+          onOpenChange={setShowValidationDialog}
+          initialData={extractedData}
+          onConfirm={handleConfirmData}
+          isManualEntry={isManualEntry}
+        />
+      )}
     </div>
   );
 }

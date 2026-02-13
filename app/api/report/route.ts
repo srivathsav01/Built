@@ -11,19 +11,23 @@ export async function POST(req: Request) {
   const supabase = await supabaseServer();
 
   const { data, error } = await supabase.from("InbodyReport").insert({
-    user_id: user.id,
-    scan_date: body.scan_date,
+    userId: user.id,
+    date: body.testDateTime,
     weight: body.weight,
-    skeletal_muscle_mass: body.skeletal_muscle_mass,
-    body_fat_percentage: body.body_fat_percentage,
-    body_water: body.body_water,
-    bmi: body.bmi,
-    image_url: body.image_url,
-  });
+    height: body.height,
+    age: body.age,
+    skeletalMuscleMass: body.skeletalMuscleMass,
+    bodyFatPct: body.pbf,
+    bodyFatMass: body.bodyFatMass,
+    totalBodyWater: body.totalBodyWater,
+    protein: body.protein,
+    mineral: body.mineral,
+    bodyMassIndex: body.bmi,
+  }).select();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, data });
 }
 
 export async function GET() {
