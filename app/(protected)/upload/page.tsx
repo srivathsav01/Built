@@ -6,6 +6,7 @@ import { InBodyDataValidationDialog } from "@/components/InBodyDataValidationDia
 import { useLoading } from "@/lib/context/LoadingContext";
 import { InBodyData } from "@/lib/inbody";
 import { useRef, useState, useTransition } from "react";
+import { toast } from "sonner";
 
 const EMPTY_INBODY_DATA: InBodyData = {
   totalBodyWater: null,
@@ -41,11 +42,15 @@ export default function UploadPage() {
 
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Failed to save report");
-
+      toast.success("Report saved successfully", { position: "top-center" });
       console.log("Report saved successfully:", json.data);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       console.error("Error saving report:", message);
+      toast.error("Failed to save the report", {
+        description: message,
+        position: "top-center",
+      });
     } finally {
       setIsLoading(false);
       setExtractedData(null);

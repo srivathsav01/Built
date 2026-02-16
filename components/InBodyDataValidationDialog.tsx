@@ -29,20 +29,21 @@ type FieldConfig = {
   key: keyof InBodyData;
   label: string;
   unit?: string;
+  isRequired?: boolean;
 };
 
 const FIELD_CONFIG: FieldConfig[] = [
-  { key: "weight", label: "Weight", unit: "kg" },
-  { key: "height", label: "Height", unit: "cm" },
-  { key: "age", label: "Age", unit: "years" },
-  { key: "totalBodyWater", label: "Total Body Water", unit: "L" },
-  { key: "protein", label: "Protein", unit: "kg" },
-  { key: "mineral", label: "Mineral", unit: "kg" },
-  { key: "bodyFatMass", label: "Body Fat Mass", unit: "kg" },
-  { key: "skeletalMuscleMass", label: "Skeletal Muscle Mass", unit: "kg" },
-  { key: "bmi", label: "BMI", unit: "kg/m²" },
-  { key: "pbf", label: "Percent Body Fat", unit: "%" },
-  { key: "testDateTime", label: "Test Date/Time" },
+  { key: "weight", label: "Weight", unit: "kg", isRequired: true },
+  { key: "height", label: "Height", unit: "cm", isRequired: true },
+  { key: "age", label: "Age", unit: "years", isRequired: true },
+  { key: "totalBodyWater", label: "Total Body Water", unit: "L", isRequired: false },
+  { key: "protein", label: "Protein", unit: "kg", isRequired: false },
+  { key: "mineral", label: "Mineral", unit: "kg", isRequired: false },
+  { key: "bodyFatMass", label: "Body Fat Mass", unit: "kg", isRequired: false },
+  { key: "skeletalMuscleMass", label: "Skeletal Muscle Mass", unit: "kg", isRequired: false },
+  { key: "bmi", label: "BMI", unit: "kg/m²", isRequired: false },
+  { key: "pbf", label: "Percent Body Fat", unit: "%", isRequired: true },
+  { key: "testDateTime", label: "Test Date/Time", isRequired: true },
 ];
 
 export function InBodyDataValidationDialog({
@@ -75,6 +76,16 @@ export function InBodyDataValidationDialog({
     onConfirm(formData);
     onOpenChange(false);
   };
+
+  const isDisabled = () => {
+    // Check required fields
+    for (const { key, isRequired } of FIELD_CONFIG) {
+      if (isRequired && (formData[key] === null || formData[key] === "")) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   // Convert "DD.MM.YYYY HH:mm" to "YYYY-MM-DDTHH:mm" for datetime-local input
   const convertToDateTimeLocal = (value: string | null): string => {
@@ -131,7 +142,7 @@ export function InBodyDataValidationDialog({
           )}
 
           <div className="grid grid-cols-2 gap-4">
-            {FIELD_CONFIG.map(({ key, label, unit }) => (
+            {FIELD_CONFIG.map(({ key, label, unit, isRequired }) => (
               <div key={key} className="space-y-2">
                 <Label htmlFor={key}>
                   {label}
@@ -139,12 +150,16 @@ export function InBodyDataValidationDialog({
                   {!isManualEntry && initialData[key] === null && (
                     <span className="text-destructive ml-1">*</span>
                   )}
+                  {isRequired && (
+                    <span className="text-grey-500 ml-1">*</span>
+                  )}
                 </Label>
                 <Input
                   id={key}
                   type={key === "testDateTime" ? "datetime-local" : "number"}
                   step={key === "testDateTime" ? undefined : "0.1"}
                   value={formatValue(formData[key], key)}
+                  required={isRequired}
                   onChange={(e) => handleFieldChange(key, e.target.value)}
                   placeholder={!isManualEntry && initialData[key] === null ? "Not detected" : ""}
                   className={!isManualEntry && initialData[key] === null ? "border-destructive" : ""}
@@ -156,7 +171,9 @@ export function InBodyDataValidationDialog({
 
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm}>
+          <AlertDialogAction onClick={handleConfirm} 
+          disabled={isDisabled()}
+          >
             {isManualEntry ? "Save Data" : "Confirm Data"}
           </AlertDialogAction>
         </AlertDialogFooter>
